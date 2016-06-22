@@ -12,7 +12,27 @@ $(document).ready(function(){
   		$('.overlay').fadeOut(1000);
   	});
 
-  	newGame();
+  	// New game
+	$('.new').click(newGame);
+		
+	// Ensure user supplies numeric input between 1 - 100
+	$('form').submit(function(event){
+		event.preventDefault();
+		if (wonGame === false) {
+			guess = +$('#userGuess').val();
+			if (guess % 1 !== 0 || guess > 100 || guess < 0){
+				alert('Not a Valid Number');
+			}
+			else {
+				handleGuess(guess);
+			}
+		}
+		else {
+			updateFeedback('Start a new game.');
+		}
+	});
+
+	newGame();
 });
 
 // global variables
@@ -21,20 +41,24 @@ var wonGame;
 var secretNumber;
 
 // Clear guess text section
-var clearGuess = function() {
+var clearGuessInput = function() {
 	$('#userGuess').val('').focus();
 }
 
-// Remove past guesses
-var removePastGuesses = function(){
+var resetGuesses = function() {
+	guessCount = 0;
 	$('ul.guessBox li').remove();
+ 	clearGuessInput();
 }
+
 
 // Starts new game when page loads and button is clicked
 function newGame() {
 	updateFeedback('Make your guess!');
-	guessCount = 0;
 	generateNumber();
+	resetGuesses();
+	wonGame = false;
+	updateGuessCount();
 }
 
 // Secret number generated between 1 - 100 each time new game starts
@@ -80,50 +104,21 @@ function trackGuessCount() {
 	
 }
 
+function handleGuess(guess) {
+	$('.guessBox').append('<li>' + guess + '</li>');
+	clearGuessInput();
+	updateGuessCount();
+	updateFeedbackFromGuess(guess);
+}
 
 function updateGuessCount() {
 	guessCount++;
 	$('#count').text(guessCount);
-	//increment guessCount
-	//log out guessCount to span#count
 }
 
 
-// Supply list of numbers user has guessed
-function guessList() {
-	$('#guessList').append('<li>' + guess + '</li>');
-}
-
-// Ensure user supplies numeric input between 1 - 100
-$('form').submit(function(event){
-	event.preventDefault();
-	if (wonGame === false) {
-		guess = +$('#userGuess').val();
-		if (guess % 1 !== 0 || guess > 100 || guess < 0){
-			alert('Not a Valid Number');
-		}
-		else {
-			event.preventDefault();
-			$('#guessBox').append('<li>' + guess + '</li>');
-			clearGuess();
-			guessCount++
-			guessList();
-			updateFeedbackFromGuess(guess);
-		}
-	}
-	else {
-		updateFeedback('Start a new game.');
-	}
-});
 
 
-// New game
-$('.new').click(function(){
-	newGame();
-	clearGuess();
-	guessCount = 0;
-	wonGame = false;
-	removePastGuesses();
-	updateGuessCount();
-	updateFeedback('Make your guess!');
-});
+
+
+
